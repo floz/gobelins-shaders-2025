@@ -173,13 +173,13 @@ export function initSphereDemo() {
 
             // Fresnel effect (using view space position)
             vec3 viewDir = normalize(vCustomViewPosition);
-            float fresnel = pow(1.0 - max(0.0, dot(-viewDir, normal)), 2.0);
+            float fresnel = pow(1.0 - max(0.0, dot(-viewDir, vNormal)), 2.0);
 
             // Add fresnel as emissive glow
             #ifdef USE_EMISSIVE
-                totalEmissiveRadiance += fresnel * 0.3 * (uColorA + uColorB) * 0.5;
+                totalEmissiveRadiance += fresnel * (uColorA + uColorB) * 0.5;
             #else
-                diffuseColor.rgb += fresnel * 0.3;
+                diffuseColor.rgb += fresnel;
             #endif
             `
         );
@@ -187,13 +187,7 @@ export function initSphereDemo() {
         console.log('✅ Simplified sphere shader complete! Only 4 replacements used.');
     };
 
-    // Force material update when uniforms change
-    material.customProgramCacheKey = () => {
-        return Date.now();
-    };
-
     const sphere = new THREE.Mesh(sphereGeometry, material);
-    sphere.castShadow = true;
     sphere.receiveShadow = true;
     scene.add(sphere);
 
@@ -254,33 +248,6 @@ export function initSphereDemo() {
 
     // Animation control
     gui.add(params, 'autoRotate');
-
-    // Info button
-    gui.add({
-        info: () => {
-            console.log(`
-            === SIMPLIFIED APPROACH ===
-
-            Only 4 shader replacements needed:
-
-            VERTEX SHADER:
-            1. Replace 'void main()' → Add declarations before
-            2. Replace '#include <begin_vertex>' → Apply deformations
-
-            FRAGMENT SHADER:
-            3. Replace 'void main()' → Add declarations before
-            4. Replace '#include <color_fragment>' → Apply colors
-
-            This is MUCH simpler than multiple specific replacements!
-
-            Benefits:
-            ✅ Easy to understand
-            ✅ Less error-prone
-            ✅ Strategic use of includes
-            ✅ Keeps all PBR features
-            `);
-        }
-    }, 'info').name('ℹ️ About Simplified Approach');
 
     start((elapsedTime) => {
         uniforms.uTime.value = elapsedTime;
