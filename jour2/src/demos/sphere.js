@@ -1,10 +1,6 @@
 import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { createScene } from '../utils/scene.js';
-import { patchPhysicalMaterial, buildShaderMaterial } from '../shaders/inject.js';
-// Optional: direct shader imports if needed
-// import vertexShader from '../shaders/vCustom.glsl';
-// import fragmentShader from '../shaders/fCustom.glsl';
 
 let gui;
 
@@ -14,96 +10,284 @@ export function initSphereDemo() {
         enableOrbitControls: true
     });
 
-    const textureLoader = new THREE.TextureLoader();
-    const textureA = textureLoader.load('/assets/textures/a.jpg');
-    const textureB = textureLoader.load('/assets/textures/b.jpg');
-
     const uniforms = {
-        uThreshold: { value: 0.5 },
-        uTwist: { value: 0.0 },
-        uDispAmp: { value: 0.0 },
         uTime: { value: 0 },
-        uUseTextures: { value: false },
-        uColorA: { value: new THREE.Color(0x00ff88) },
-        uColorB: { value: new THREE.Color(0xff0088) },
-        uMapA: { value: textureA },
-        uMapB: { value: textureB }
+        uNoiseScale: { value: 3.0 },
+        uNoiseSpeed: { value: 0.2 },
+        uNoiseAmplitude: { value: 0.15 },
+        uColorA: { value: new THREE.Color(0x6366f1) },
+        uColorB: { value: new THREE.Color(0xec4899) }
     };
 
     const sphereGeometry = new THREE.SphereGeometry(1, 256, 128);
 
-    let physicalMaterial = new THREE.MeshPhysicalMaterial({
+    // Create MeshPhysicalMaterial with PBR properties
+    const material = new THREE.MeshPhysicalMaterial({
         color: 0xffffff,
         metalness: 0.3,
         roughness: 0.4,
         clearcoat: 0.5,
         clearcoatRoughness: 0.1
     });
-    physicalMaterial = patchPhysicalMaterial(physicalMaterial, uniforms);
 
-    const shaderMaterial = buildShaderMaterial(uniforms);
+    // SIMPLIFIED APPROACH - Only 4 replacements total!
+    material.onBeforeCompile = (shader) => {
+        // Add uniforms to the shader
+        Object.keys(uniforms).forEach(key => {
+            shader.uniforms[key] = uniforms[key];
+        });
 
-    const sphere = new THREE.Mesh(sphereGeometry, physicalMaterial);
+        // ======================================
+        // VERTEX SHADER - Only 2 replacements!
+        // ======================================
+
+        // 1. Add declarations before main()
+        shader.vertexShader = shader.vertexShader.replace(
+            'void main() {',
+            `
+            // === CUSTOM UNIFORMS & FUNCTIONS ===
+            uniform float uTime;
+            uniform float uNoiseScale;
+            uniform float uNoiseSpeed;
+            uniform float uNoiseAmplitude;
+
+            varying float vNoise;
+            varying vec3 vCustomViewPosition;
+
+            //	Simplex 3D Noise by Ian McEwan, Ashima Arts
+            vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
+            vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+
+            float snoise(vec3 v){
+                const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+
+                vec3 i = floor(v + dot(v, C.yyy));
+                vec3 x0 = v - i + dot(i, C.xxx);
+
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min(g.xyz, l.zxy);
+                vec3 i2 = max(g.xyz, l.zxy);
+
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + 2.0 * C.xxx;
+                vec3 x3 = x0 - D.yyy;
+
+                i = mod(i, 289.0);
+                vec4 p = permute(permute(permute(
+                    i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+                float n_ = 0.142857142857;
+                vec3 ns = n_ * D.wyz - D.xzx;
+
+                vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_);
+
+                vec4 x = x_ * ns.x + ns.yyyy;
+                vec4 y = y_ * ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+
+                vec4 b0 = vec4(x.xy, y.xy);
+                vec4 b1 = vec4(x.zw, y.zw);
+
+                vec4 s0 = floor(b0) * 2.0 + 1.0;
+                vec4 s1 = floor(b1) * 2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+
+                vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+                vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+                vec3 p0 = vec3(a0.xy, h.x);
+                vec3 p1 = vec3(a0.zw, h.y);
+                vec3 p2 = vec3(a1.xy, h.z);
+                vec3 p3 = vec3(a1.zw, h.w);
+
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                p0 *= norm.x;
+                p1 *= norm.y;
+                p2 *= norm.z;
+                p3 *= norm.w;
+
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+            }
+
+            void main() {`
+        );
+
+        // 2. Apply deformations at begin_vertex
+        shader.vertexShader = shader.vertexShader.replace(
+            '#include <begin_vertex>',
+            `
+            // === APPLY VERTEX DEFORMATIONS ===
+            vec3 transformed = vec3(position);
+
+            // Calculate noise
+            vec3 noiseCoord = position * uNoiseScale + uTime * uNoiseSpeed;
+            float noise = snoise(noiseCoord);
+            vNoise = noise;
+
+            // Displace vertex along normal
+            transformed += normal * noise * uNoiseAmplitude;
+
+            // Store view position for fresnel (before transformation)
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            vCustomViewPosition = mvPos.xyz;
+            `
+        );
+
+        // ======================================
+        // FRAGMENT SHADER - Only 2 replacements!
+        // ======================================
+
+        // 3. Add declarations before main()
+        shader.fragmentShader = shader.fragmentShader.replace(
+            'void main() {',
+            `
+            // === CUSTOM UNIFORMS & VARYINGS ===
+            uniform vec3 uColorA;
+            uniform vec3 uColorB;
+
+            varying float vNoise;
+            varying vec3 vCustomViewPosition;
+
+            void main() {`
+        );
+
+        // 4. Apply custom colors and effects
+        shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <color_fragment>',
+            `
+            #include <color_fragment>
+
+            // === APPLY CUSTOM COLORS & EFFECTS ===
+            // Mix colors based on noise
+            vec3 noiseColor = mix(uColorA, uColorB, vNoise * 0.5 + 0.5);
+            diffuseColor.rgb *= noiseColor;
+
+            // Fresnel effect (using view space position)
+            vec3 viewDir = normalize(vCustomViewPosition);
+            float fresnel = pow(1.0 - max(0.0, dot(-viewDir, normal)), 2.0);
+
+            // Add fresnel as emissive glow
+            #ifdef USE_EMISSIVE
+                totalEmissiveRadiance += fresnel * 0.3 * (uColorA + uColorB) * 0.5;
+            #else
+                diffuseColor.rgb += fresnel * 0.3;
+            #endif
+            `
+        );
+
+        console.log('✅ Simplified sphere shader complete! Only 4 replacements used.');
+    };
+
+    // Force material update when uniforms change
+    material.customProgramCacheKey = () => {
+        return Date.now();
+    };
+
+    const sphere = new THREE.Mesh(sphereGeometry, material);
     sphere.castShadow = true;
     sphere.receiveShadow = true;
     scene.add(sphere);
 
+    // GUI Controls
     const params = {
-        threshold: 0.5,
-        twist: 0.0,
-        dispAmp: 0.0,
-        useTextures: false,
-        colorA: '#00ff88',
-        colorB: '#ff0088',
-        materialMode: 'physical',
-        reset: () => {
-            params.threshold = 0.5;
-            params.twist = 0.0;
-            params.dispAmp = 0.0;
-            params.useTextures = false;
-            gui.controllers.forEach(c => c.updateDisplay());
-        }
+        noiseScale: 3.0,
+        noiseSpeed: 0.2,
+        noiseAmplitude: 0.15,
+        colorA: '#6366f1',
+        colorB: '#ec4899',
+        metalness: 0.3,
+        roughness: 0.4,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.1,
+        autoRotate: true
     };
 
     gui = new GUI();
 
-    const shaderFolder = gui.addFolder('Shader Parameters');
-    shaderFolder.add(params, 'threshold', 0, 1).onChange(value => {
-        uniforms.uThreshold.value = value;
+    // Noise controls
+    const noiseFolder = gui.addFolder('🌊 Noise Parameters');
+    noiseFolder.add(params, 'noiseScale', 0.5, 10).onChange(value => {
+        uniforms.uNoiseScale.value = value;
     });
-    shaderFolder.add(params, 'twist', -5, 5).onChange(value => {
-        uniforms.uTwist.value = value;
+    noiseFolder.add(params, 'noiseSpeed', 0, 1).onChange(value => {
+        uniforms.uNoiseSpeed.value = value;
     });
-    shaderFolder.add(params, 'dispAmp', 0, 0.3).onChange(value => {
-        uniforms.uDispAmp.value = value;
+    noiseFolder.add(params, 'noiseAmplitude', 0, 0.5).onChange(value => {
+        uniforms.uNoiseAmplitude.value = value;
     });
-    shaderFolder.open();
+    noiseFolder.open();
 
-    const textureFolder = gui.addFolder('Texture/Color');
-    textureFolder.add(params, 'useTextures').name('Use Textures').onChange(value => {
-        uniforms.uUseTextures.value = value;
-    });
-    textureFolder.addColor(params, 'colorA').onChange(value => {
+    // Color controls
+    const colorFolder = gui.addFolder('🎨 Colors');
+    colorFolder.addColor(params, 'colorA').onChange(value => {
         uniforms.uColorA.value.set(value);
     });
-    textureFolder.addColor(params, 'colorB').onChange(value => {
+    colorFolder.addColor(params, 'colorB').onChange(value => {
         uniforms.uColorB.value.set(value);
     });
-    textureFolder.open();
+    colorFolder.open();
 
-    const materialFolder = gui.addFolder('Material Mode');
-    materialFolder.add(params, 'materialMode', ['physical', 'shader']).onChange(value => {
-        if (value === 'physical') {
-            sphere.material = physicalMaterial;
-        } else {
-            sphere.material = shaderMaterial;
-        }
+    // Material PBR properties
+    const materialFolder = gui.addFolder('✨ Material PBR');
+    materialFolder.add(params, 'metalness', 0, 1).onChange(value => {
+        material.metalness = value;
+    });
+    materialFolder.add(params, 'roughness', 0, 1).onChange(value => {
+        material.roughness = value;
+    });
+    materialFolder.add(params, 'clearcoat', 0, 1).onChange(value => {
+        material.clearcoat = value;
+    });
+    materialFolder.add(params, 'clearcoatRoughness', 0, 1).onChange(value => {
+        material.clearcoatRoughness = value;
     });
     materialFolder.open();
 
+    // Animation control
+    gui.add(params, 'autoRotate');
+
+    // Info button
+    gui.add({
+        info: () => {
+            console.log(`
+            === SIMPLIFIED APPROACH ===
+
+            Only 4 shader replacements needed:
+
+            VERTEX SHADER:
+            1. Replace 'void main()' → Add declarations before
+            2. Replace '#include <begin_vertex>' → Apply deformations
+
+            FRAGMENT SHADER:
+            3. Replace 'void main()' → Add declarations before
+            4. Replace '#include <color_fragment>' → Apply colors
+
+            This is MUCH simpler than multiple specific replacements!
+
+            Benefits:
+            ✅ Easy to understand
+            ✅ Less error-prone
+            ✅ Strategic use of includes
+            ✅ Keeps all PBR features
+            `);
+        }
+    }, 'info').name('ℹ️ About Simplified Approach');
+
     start((elapsedTime) => {
         uniforms.uTime.value = elapsedTime;
-        sphere.rotation.y = elapsedTime * 0.1;
+
+        if (params.autoRotate) {
+            sphere.rotation.y = elapsedTime * 0.1;
+        }
     });
 
     return {
