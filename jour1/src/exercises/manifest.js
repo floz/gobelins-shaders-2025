@@ -16,6 +16,7 @@ import helloworldFrag from './helloworld.frag?raw';
 import thresholdRevealFrag from './threshold-reveal.frag?raw';
 import gridFrag from './grid.frag?raw';
 import wavyGridFrag from './wavy-grid.frag?raw';
+import curlFlowFrag from './curl-flow.frag?raw';
 
 export const exercises = [
   {
@@ -183,9 +184,9 @@ export const exercises = [
       u_mixFactor: { type: 'float', value: 0.5, min: 0, max: 1, step: 0.01, gui: true, label: 'Mix Factor' },
       u_blendMode: { type: 'select', value: 0, options: [
         { label: 'Mix', value: 0 },
-        { label: 'Add', value: 1 },
-        { label: 'Multiply', value: 2 },
-        { label: 'Screen', value: 3 }
+        { label: 'Multiply', value: 1 },
+        { label: 'Screen', value: 2 },
+        { label: 'Overlay', value: 3 }
       ], gui: true, label: 'Blend Mode' },
       u_colorA: { type: 'color', value: [1.0, 0.2, 0.3], gui: true, label: 'Couleur A' },
       u_colorB: { type: 'color', value: [0.2, 0.4, 1.0], gui: true, label: 'Couleur B' },
@@ -266,6 +267,20 @@ export const exercises = [
       u_warpStrength: { type: 'float', value: 1, min: 0, max: 2, step: 0.01, gui: true, label: 'Intensité' },
       u_speed: { type: 'float', value: 1, min: 0, max: 3, step: 0.01, gui: true, label: 'Vitesse' },
       u_aspectCorrection: { type: 'bool', value: false, gui: true, label: 'Correction Aspect' }
+    }
+  },
+  {
+    id: 'curl-flow',
+    name: 'Curl Flow',
+    description: 'Flux dynamique avec curl noise',
+    fragSource: curlFlowFrag,
+    uniforms: {
+      u_scale: { type: 'float', value: 5, min: 1, max: 20, step: 0.1, gui: true, label: 'Échelle' },
+      u_speed: { type: 'float', value: 1, min: 0, max: 3, step: 0.01, gui: true, label: 'Vitesse' },
+      u_strength: { type: 'float', value: 1, min: 0, max: 5, step: 0.01, gui: true, label: 'Force' },
+      u_visualizeFlow: { type: 'float', value: 0, min: 0, max: 1, step: 0.01, gui: true, label: 'Visualiser flux' },
+      u_advectionSteps: { type: 'float', value: 5, min: 0, max: 10, step: 1, gui: true, label: 'Étapes advection' },
+      u_colorMix: { type: 'float', value: 0.5, min: 0, max: 1, step: 0.01, gui: true, label: 'Coloration' }
     }
   }
 ];

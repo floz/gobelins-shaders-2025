@@ -11,4 +11,5 @@
 11. texture-warp - 12 modes de distorsion UV
 12. threshold-reveal - Masques et r\u00e9v\u00e9lation progressive
 13. kaleidoscope - Transformations polaires complexes
-14. helloworld - Exemple complexe m\u00e9langeant tout
+14. helloworld - Exemple complexe mélangeant tout
+15. curl-flow - Flux dynamique avec curl noise
