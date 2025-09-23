@@ -1,3 +1,23 @@
+// SHADER 03: STEP VS SMOOTH - Transitions et seuillage
+// =====================================================
+// CONCEPTS APPRIS:
+// - step(): transition brutale (0 ou 1)
+// - smoothstep(): transition douce avec antialiasing
+// - Différence entre transitions dures et douces
+// - Contrôle de la netteté des bords
+// - Animation de seuils
+//
+// APPLICATIONS:
+// - Création de masques
+// - Antialiasing manuel
+// - Effets de révélation
+// - Transitions douces entre états
+//
+// EXERCICES:
+// - Créez un cercle avec step() puis smoothstep()
+// - Utilisez plusieurs seuils pour créer des bandes
+// - Combinez avec du bruit pour des bords organiques
+
 precision highp float;
 
 varying vec2 vUv;

@@ -12,6 +12,7 @@ import colorGlsl from '../libs/color.glsl?raw';
 import mathGlsl from '../libs/math.glsl?raw';
 import sdfGlsl from '../libs/sdf.glsl?raw';
 import curlNoiseGlsl from '../libs/curl-noise.glsl?raw';
+import kaleidoscope from '../libs/kaleidoscope.glsl?raw';
 
 // Library map
 const libraries = {
@@ -24,18 +25,14 @@ const libraries = {
   'color': colorGlsl,
   'math': mathGlsl,
   'sdf': sdfGlsl,
-  'curl-noise': curlNoiseGlsl
+  'curl-noise': curlNoiseGlsl,
+  'kaleidoscope': kaleidoscope
 };
 
 export class ShaderPreprocessor {
   constructor() {
     this.includes = new Set();
     this.processedLibs = new Map();
-    // Define library dependencies
-    this.dependencies = {
-      'curl-noise': ['simplex'],
-      'sdf': ['math']
-    };
   }
 
   process(shaderSource) {
@@ -73,26 +70,15 @@ export class ShaderPreprocessor {
   }
 
   processIncludes(source) {
-    // Handle #pragma glslify: import() syntax
-    const importRegex = /#pragma\s+glslify:\s*import\(['"]([^'"]+)['"]\)/g;
+    // Handle #import("...") syntax (new simplified syntax)
+    const simpleImportRegex = /#import\s*\(\s*["']([^"']+)["']\s*\)/g;
 
-    source = source.replace(importRegex, (match, libPath) => {
+    source = source.replace(simpleImportRegex, (match, libPath) => {
       const libName = this.extractLibName(libPath);
 
       this.includeLibrary(libName);
 
       return ''; // Remove the import line
-    });
-
-    // Handle simpler #include syntax
-    const includeRegex = /#include\s+["']([^"']+)["']/g;
-
-    source = source.replace(includeRegex, (match, libPath) => {
-      const libName = this.extractLibName(libPath);
-
-      this.includeLibrary(libName);
-
-      return ''; // Remove the include line
     });
 
     return source;
@@ -101,19 +87,17 @@ export class ShaderPreprocessor {
   includeLibrary(libName) {
     if (this.includes.has(libName)) return;
 
-    // First, include any dependencies
-    if (this.dependencies[libName]) {
-      for (const dep of this.dependencies[libName]) {
-        this.includeLibrary(dep);
-      }
-    }
-
     this.includes.add(libName);
 
     if (libraries[libName]) {
-      // Process the library for nested imports
+      // Process the library for nested imports FIRST
       const processedLib = this.processLibraryIncludes(libraries[libName]);
+
+      // Store the processed version (with imports removed)
       this.processedLibs.set(libName, processedLib);
+
+      // Note: dependencies are now handled by processLibraryIncludes
+      // which calls includeLibrary recursively
     } else {
       console.warn(`Library not found: ${libName}`);
     }
@@ -121,22 +105,20 @@ export class ShaderPreprocessor {
 
   processLibraryIncludes(libSource) {
     // Process nested includes in libraries
-    const requireRegex = /#pragma\s+glslify:\s*\w+\s*=\s*require\(([^)]+)\)/g;
 
-    return libSource.replace(requireRegex, (match, requirePath) => {
-      const libName = this.extractLibName(requirePath);
+    // Handle #import("...") syntax (preferred)
+    const importRegex = /#import\s*\(\s*["']([^"']+)["']\s*\)/g;
 
-      if (!this.includes.has(libName)) {
-        this.includes.add(libName);
+    libSource = libSource.replace(importRegex, (match, libPath) => {
+      const libName = this.extractLibName(libPath);
 
-        if (libraries[libName]) {
-          const processedLib = this.processLibraryIncludes(libraries[libName]);
-          this.processedLibs.set(libName, processedLib);
-        }
-      }
+      // Use includeLibrary to properly handle dependencies
+      this.includeLibrary(libName);
 
-      return ''; // Remove the require line as the content will be included
+      return ''; // Remove the import line as the content will be included
     });
+
+    return libSource;
   }
 
   extractLibName(path) {

@@ -1,3 +1,32 @@
+// SHADER 06: GRID - Patterns répétitifs et modulo
+// =================================================
+// CONCEPTS APPRIS:
+// - fract(): répétition de motifs (partie fractionnaire)
+// - mod(): opération modulo pour patterns cycliques
+// - Création de grilles avec mathématiques simples
+// - Différents types de grilles (lignes, points, hexagones)
+// - Animation de patterns
+//
+// TECHNIQUES CLÉS:
+// - fract(uv * gridSize): divise l'espace en cellules
+// - abs(fract(x - 0.5) - 0.5): crée des lignes
+// - length(cellCenter - 0.5): points aux intersections
+// - step() et smoothstep() pour le rendu
+//
+// MODES IMPLÉMENTÉS:
+// - Grille standard
+// - Points aux intersections
+// - Lignes pointillées
+// - Grille diagonale
+// - Grille hexagonale
+// - Crosshatch
+// - Grille circulaire/polaire
+//
+// EXERCICES:
+// - Créez une grille triangulaire
+// - Ajoutez de la couleur par cellule
+// - Déformez la grille avec du bruit
+
 precision highp float;
 
 varying vec2 vUv;

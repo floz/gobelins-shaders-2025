@@ -1,3 +1,33 @@
+// SHADER 10: WAVY GRID - Combinaison complexe de techniques
+// ==========================================================
+// CONCEPTS APPRIS:
+// - Combinaison de multiples techniques (grilles + waves + bruit)
+// - FBM personnalisé (Fractal Brownian Motion)
+// - Superposition de fonctions d'onde
+// - Grilles déformées horizontales ET verticales
+// - Effets d'intersection entre lignes
+// - Variation de couleur procédurale
+//
+// TECHNIQUES AVANCÉES:
+// - Multiples ondes sinusoïdales combinées
+// - Bruit multi-octave pour mouvement organique
+// - Jitter pour aspect fait main
+// - Intersections mises en valeur
+// - Vignettage pour la profondeur
+//
+// STRUCTURE:
+// 1. Fonction d'onde complexe (3 sinus combinés)
+// 2. Ajout de bruit FBM pour organicité
+// 3. Dessin de lignes horizontales ondulées
+// 4. Dessin de lignes verticales ondulées
+// 5. Mise en valeur des intersections
+// 6. Post-processing (vignette, variations)
+//
+// EXERCICES:
+// - Créez des patterns de vagues différents
+// - Ajoutez de la rotation aux vagues
+// - Implémentez un effet de distorsion radiale
+
 precision highp float;
 
 varying vec2 vUv;

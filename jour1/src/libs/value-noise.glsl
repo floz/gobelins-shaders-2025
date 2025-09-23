@@ -1,7 +1,7 @@
 // Value Noise
 // Simple value noise implementation
 
-#pragma glslify: random = require(./random.glsl)
+#import("random")
 
 float valueNoise(vec2 st) {
   vec2 i = floor(st);

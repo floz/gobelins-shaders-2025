@@ -1,3 +1,28 @@
+// SHADER 09: NOISE LINES - Application du bruit pour distorsion
+// ==============================================================
+// CONCEPTS APPRIS:
+// - Utilisation du bruit pour déformer des formes
+// - Chaînage de bruit (noise of noise)
+// - Déplacement de coordonnées avec du bruit
+// - Création d'effets organiques
+// - Animation fluide avec bruit temporel
+//
+// TECHNIQUE CLÉ:
+// - Calculer le bruit basé sur la position
+// - Utiliser ce bruit pour déplacer les coordonnées X
+// - Dessiner des lignes à ces positions déformées
+// - Résultat: lignes ondulantes organiques
+//
+// DOUBLE BRUIT:
+// - Premier passage: bruit de base
+// - Deuxième passage: bruit du bruit (plus complexe)
+// - Crée des mouvements plus naturels
+//
+// EXERCICES:
+// - Ajoutez plus de lignes verticales
+// - Déformez aussi en Y pour un effet 2D complet
+// - Variez l'épaisseur des lignes avec du bruit
+
 precision highp float;
 
 #import("value-noise")

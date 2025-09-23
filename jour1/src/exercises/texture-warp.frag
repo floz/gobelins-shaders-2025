@@ -1,3 +1,39 @@
+// SHADER 11: TEXTURE WARP - Manipulation avancée des UVs
+// =======================================================
+// CONCEPTS APPRIS:
+// - Déformation de textures avec mathématiques
+// - 12 modes de distorsion différents
+// - Transformations polaires (swirl, vortex)
+// - Effets de lentille (barrel/pincushion)
+// - Chromatic aberration (split RGB)
+// - Patterns kaléidoscopiques
+//
+// MODES DE DISTORSION:
+// 1. Ripple croisé: ondes horizontales et verticales
+// 2. Vague diagonale: distorsion sur les diagonales
+// 3. Swirl radial: rotation selon la distance
+// 4. Barrel/Pincushion: distorsion de lentille
+// 5. Kaleidoscope: effet miroir avec abs/fract
+// 6. Checker warp: distorsion en damier
+// 7. Zoom pulsé: zoom animé avec cos
+// 8. Wave tunnel: ondes circulaires
+// 9. Shear: cisaillement horizontal
+// 10. Twist damier: rotation locale par zones
+// 11. Vortex doux: tourbillon avec atan
+// 12. Chroma split: décalage RGB (aberration chromatique)
+//
+// TECHNIQUES MATHÉMATIQUES:
+// - sin/cos pour ondulations
+// - atan2 pour coordonnées polaires
+// - length pour distance radiale
+// - mod/fract pour répétitions
+// - abs pour effets miroir
+//
+// EXERCICES:
+// - Combinez plusieurs modes de distorsion
+// - Créez une transition entre modes
+// - Ajoutez du bruit pour plus d'organicité
+
 precision highp float;
 
 varying vec2 vUv;

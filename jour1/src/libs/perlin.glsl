@@ -1,7 +1,7 @@
 // Perlin Noise
 // Classic Perlin noise implementation
 
-#pragma glslify: random2 = require(./random.glsl)
+#import("random")
 
 float perlinNoise(vec2 st) {
   vec2 i = floor(st);

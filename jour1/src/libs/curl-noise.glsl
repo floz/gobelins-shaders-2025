@@ -1,6 +1,8 @@
 // Curl Noise
 // Creates divergence-free noise fields useful for fluid-like motion
 
+#import("simplex")
+
 vec2 curlNoise2D(vec2 p, float epsilon) {
   // Sample noise at offset positions
   float n1 = simplexNoise(vec2(p.x, p.y + epsilon));

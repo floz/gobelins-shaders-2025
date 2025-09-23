@@ -1,3 +1,30 @@
+// SHADER 08: NOISE INTRO - Bruit procédural fondamental
+// ======================================================
+// CONCEPTS APPRIS:
+// - Différents types de bruit (value, Perlin, simplex, curl)
+// - FBM (Fractal Brownian Motion): superposition d'octaves
+// - Octaves: couches de bruit à différentes fréquences
+// - Amplitude et fréquence dans le bruit
+// - Colorisation du bruit
+// - Ajustement du contraste
+//
+// TYPES DE BRUIT:
+// - Value noise: interpolé entre valeurs aléatoires
+// - Perlin noise: gradients aléatoires, plus smooth
+// - Simplex noise: version optimisée du Perlin
+// - Curl noise: champ de vecteurs sans divergence
+//
+// FBM (FRACTAL BROWNIAN MOTION):
+// - Superpose plusieurs octaves de bruit
+// - Chaque octave: fréquence * 2, amplitude / 2
+// - Crée des détails à plusieurs échelles
+// - Simule des phénomènes naturels (nuages, terrain)
+//
+// EXERCICES:
+// - Expérimentez avec le nombre d'octaves
+// - Créez un effet de marbre avec du bruit
+// - Utilisez le bruit pour déformer d'autres patterns
+
 precision highp float;
 
 #import("random")

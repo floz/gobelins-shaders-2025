@@ -71,9 +71,38 @@ class App {
     // Setup exercise selector
     this.setupExerciseSelector();
 
-    // Load first exercise
+    // Load selected exercise or first one
     if (exercises.length > 0) {
-      await this.loadExercise(exercises[0]);
+      let selectedExercise;
+
+      // Check URL parameters first
+      const urlParams = new URLSearchParams(window.location.search);
+      const exerciseId = urlParams.get('exercise');
+
+      if (exerciseId) {
+        // Try to find exercise by ID from URL
+        selectedExercise = exercises.find(ex => ex.id === exerciseId);
+      }
+
+      // If not found in URL, look for one marked as selected in manifest
+      if (!selectedExercise) {
+        selectedExercise = exercises.find(ex => ex.selected);
+      }
+
+      // Default to first exercise if none selected
+      if (!selectedExercise) {
+        selectedExercise = exercises[0];
+      }
+
+      const selectedIndex = exercises.indexOf(selectedExercise);
+
+      // Update selector to match
+      const selector = document.getElementById('exercise-selector');
+      if (selector) {
+        selector.value = selectedIndex;
+      }
+
+      await this.loadExercise(selectedExercise);
     }
 
     // Setup resize handler
@@ -99,7 +128,14 @@ class App {
     // Handle change
     selector.addEventListener('change', async (e) => {
       const index = parseInt(e.target.value);
-      await this.loadExercise(exercises[index]);
+      const exercise = exercises[index];
+
+      // Update URL without reloading the page
+      const url = new URL(window.location);
+      url.searchParams.set('exercise', exercise.id);
+      window.history.pushState({}, '', url);
+
+      await this.loadExercise(exercise);
     });
   }
 
@@ -112,13 +148,11 @@ class App {
       // Update mesh program
       this.mesh.program = result.program;
 
-      // Setup resolution uniform if exists
-      if (result.uniforms.u_resolution) {
-        result.uniforms.u_resolution.value = [
-          this.renderer.width,
-          this.renderer.height
-        ];
-      }
+      // Update resolution uniform (always present as built-in)
+      result.uniforms.u_resolution.value = [
+        this.renderer.width,
+        this.renderer.height
+      ];
 
       // Bind GUI
       this.guiBinder.bindExercise(exercise, result.uniforms, {
@@ -148,12 +182,9 @@ class App {
 
       this.renderer.setSize(width, height);
 
-      // Update resolution uniform
-      if (this.currentExercise?.uniforms.u_resolution) {
-        this.currentExercise.uniforms.u_resolution.value = [
-          this.renderer.width,
-          this.renderer.height
-        ];
+      // Update resolution uniform (always present as built-in)
+      if (this.currentExercise?.uniforms) {
+        this.manager.resize(this.renderer.width, this.renderer.height);
       }
 
       this.render();

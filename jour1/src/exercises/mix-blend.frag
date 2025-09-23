@@ -1,3 +1,27 @@
+// SHADER 07: MIX-BLEND - Modes de fusion et combinaisons
+// =======================================================
+// CONCEPTS APPRIS:
+// - Modes de fusion (multiply, screen, overlay)
+// - Combinaison de patterns multiples
+// - Import de fonctions de blending
+// - Création de patterns procéduraux
+// - Animation du facteur de mélange
+//
+// MODES DE FUSION:
+// - Normal: interpolation linéaire simple
+// - Multiply: assombrit (a * b)
+// - Screen: éclaircit (1 - (1-a) * (1-b))
+// - Overlay: combine multiply et screen
+//
+// PATTERNS UTILISÉS:
+// - Stripes: bandes avec step()
+// - Circles: cercles dans une grille
+//
+// EXERCICES:
+// - Implémentez d'autres modes (add, subtract, difference)
+// - Créez vos propres patterns à mélanger
+// - Utilisez plusieurs couches de blending
+
 precision highp float;
 
 #import("blending")

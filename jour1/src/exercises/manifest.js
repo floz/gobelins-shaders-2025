@@ -24,7 +24,6 @@ export const exercises = [
     description: 'Petit test',
     fragSource: helloworldFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
       u_texture: { type: 'texture', value: textureUrl, gui: false },
       u_contrast: { type: 'float', value: 1.0, min: 0.5, max: 3.0, step: 0.01, gui: true, label: 'Contraste'}
     }
@@ -35,8 +34,6 @@ export const exercises = [
     description: 'Visualisation des coordonnées UV',
     fragSource: uvHeatmapFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_mode: { type: 'select', value: 0, options: [
         { label: 'Rouge (X)', value: 0 },
         { label: 'Vert (Y)', value: 1 },
@@ -48,10 +45,9 @@ export const exercises = [
     id: 'gradient',
     name: 'Gradient Simple',
     description: 'Dégradés linéaires et radiaux',
+    // selected: true, // Marque cet exercice comme sélectionné par défaut
     fragSource: gradientFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_colorA: { type: 'color', value: [0.1, 0.1, 0.2], gui: true, label: 'Couleur A' },
       u_colorB: { type: 'color', value: [0.9, 0.4, 0.2], gui: true, label: 'Couleur B' },
       u_angle: { type: 'float', value: 0, min: 0, max: 6.28, step: 0.01, gui: true, label: 'Angle' },
@@ -64,8 +60,6 @@ export const exercises = [
     description: 'Ondes sinusoïdales animées',
     fragSource: sinwaveFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_freq: { type: 'float', value: 10, min: 1, max: 40, step: 0.1, gui: true, label: 'Fréquence' },
       u_amp: { type: 'float', value: 0.15, min: 0, max: 0.6, step: 0.005, gui: true, label: 'Amplitude' },
       u_speed: { type: 'float', value: 1.0, min: -3, max: 3, step: 0.01, gui: true, label: 'Vitesse' },
@@ -80,8 +74,6 @@ export const exercises = [
     description: 'Comparaison step() et smoothstep()',
     fragSource: stepVsSmoothFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_threshold: { type: 'float', value: 0.5, min: 0, max: 1, step: 0.01, gui: true, label: 'Seuil' },
       u_smoothness: { type: 'float', value: 0.1, min: 0.001, max: 0.5, step: 0.001, gui: true, label: 'Lissage' },
       u_mode: { type: 'select', value: 0, options: [
@@ -98,8 +90,6 @@ export const exercises = [
     description: 'Révélation progressive avec masque binaire',
     fragSource: thresholdRevealFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_texture: { type: 'texture', value: textureUrl, gui: false },
       u_threshold: { type: 'float', value: 0.5, min: 0, max: 1, step: 0.01, gui: true, label: 'Seuil' },
       u_revealMode: { type: 'select', value: 0, options: [
@@ -126,8 +116,6 @@ export const exercises = [
     description: 'Grilles et motifs répétitifs',
     fragSource: gridFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_gridSize: { type: 'float', value: 10, min: 2, max: 50, step: 1, gui: true, label: 'Taille Grille' },
       u_lineWidth: { type: 'float', value: 0.02, min: 0.001, max: 0.1, step: 0.001, gui: true, label: 'Largeur Ligne' },
       u_lineColor: { type: 'color', value: [0.2, 0.8, 1.0], gui: true, label: 'Couleur Ligne' },
@@ -154,8 +142,6 @@ export const exercises = [
     description: 'Cercles, rectangles, polygones',
     fragSource: shapesFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_shape: { type: 'select', value: 0, options: [
         { label: 'Cercle', value: 0 },
         { label: 'Carré', value: 1 },
@@ -175,8 +161,6 @@ export const exercises = [
     description: 'Noise 2D simple',
     fragSource: noiseIntroFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_noiseType: { type: 'select', value: 0, options: [
         { label: 'Value Noise', value: 0 },
         { label: 'Perlin Noise', value: 1 },
@@ -196,8 +180,6 @@ export const exercises = [
     description: 'Mélange de couleurs et patterns',
     fragSource: mixBlendFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_mixFactor: { type: 'float', value: 0.5, min: 0, max: 1, step: 0.01, gui: true, label: 'Mix Factor' },
       u_blendMode: { type: 'select', value: 0, options: [
         { label: 'Mix', value: 0 },
@@ -217,8 +199,6 @@ export const exercises = [
     description: 'Répétitions et symétries',
     fragSource: kaleidoscopeFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_segments: { type: 'float', value: 6, min: 2, max: 16, step: 1, gui: true, label: 'Segments' },
       u_rotation: { type: 'float', value: 0, min: -3.14, max: 3.14, step: 0.01, gui: true, label: 'Rotation' },
       u_scale: { type: 'float', value: 1, min: 0.5, max: 3, step: 0.01, gui: true, label: 'Échelle' },
@@ -233,8 +213,6 @@ export const exercises = [
     description: 'Grille ondulée avec distorsion noise',
     fragSource: wavyGridFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_lineJitter: { type: 'float', value: 0.5, min: 0, max: 2, step: 0.01, gui: true, label: 'Jitter' },
       u_lineWidth: { type: 'float', value: 0.003, min: 0.001, max: 0.02, step: 0.0001, gui: true, label: 'Largeur Ligne' },
       u_gridSpacing: { type: 'float', value: 0.1, min: 0.02, max: 0.3, step: 0.01, gui: true, label: 'Espacement' },
@@ -254,8 +232,6 @@ export const exercises = [
     description: 'Lignes verticales déformées par du noise',
     fragSource: noiseLinesFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: [800, 600], gui: false },
       u_lineWidth: { type: 'float', value: 0.02, min: 0.001, max: 0.1, step: 0.001, gui: true, label: 'Largeur Ligne' },
       u_lineSpacing: { type: 'float', value: 0.33, min: 0.1, max: 0.5, step: 0.01, gui: true, label: 'Espacement' },
       u_noiseStrength: { type: 'float', value: 0.1, min: 0, max: 0.5, step: 0.001, gui: true, label: 'Force Noise' },
@@ -272,8 +248,6 @@ export const exercises = [
     description: 'Déformations UV sur texture',
     fragSource: textureWarpFrag,
     uniforms: {
-      u_time: { type: 'float', value: 0, gui: false },
-      u_resolution: { type: 'vec2', value: new Vec2( 800, 600 ), gui: false },
       u_texture: { type: 'texture', value: textureUrl, gui: false },
       u_warpMode: { type: 'select', value: 0, options: [
         { label: 'Ripple croisé', value: 0 },

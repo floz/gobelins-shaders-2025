@@ -24,18 +24,21 @@ export class ShaderExerciseManager {
     fragSource = this.preprocessor.process(fragSource);
 
     const uniforms = this._buildUniforms(def.uniforms);
-    
-    console.log( 'fragSource', fragSource )
+
+    // Add built-in uniforms (these are always present)
+    uniforms.u_time = { value: 0 };
+    uniforms.u_resolution = { value: [this.gl.canvas.width, this.gl.canvas.height] };
+
     const program = new Program(this.gl, {
       vertex: this.vertexSource,
       fragment: fragSource,
       uniforms
     });
-    
+
     if (this.current?.program) {
       this.current.program.remove();
     }
-    
+
     this.current = { program, uniforms, fragSource, def };
     return this.current;
   }
@@ -43,9 +46,16 @@ export class ShaderExerciseManager {
   update(dt) {
     if (!this.current) return;
     const u = this.current.uniforms;
-    if (u.u_time) {
-      u.u_time.value += dt;
-    }
+    // u_time is now always present as a built-in uniform
+    u.u_time.value += dt;
+  }
+
+  resize(width, height) {
+    if (!this.current) return;
+    const u = this.current.uniforms;
+    // u_resolution is now always present as a built-in uniform
+    u.u_resolution.value[0] = width;
+    u.u_resolution.value[1] = height;
   }
 
   dispose() {
@@ -61,7 +71,10 @@ export class ShaderExerciseManager {
     const def = this.current.def;
     const uniforms = this.current.uniforms;
 
-    for (const [name, u] of Object.entries(def.uniforms)) {
+    // Reset u_time to 0 (built-in uniform)
+    uniforms.u_time.value = 0;
+
+    for (const [name, u] of Object.entries(def.uniforms || {})) {
       if (uniforms[name]) {
         switch (u.type) {
           case 'float':
@@ -101,7 +114,7 @@ export class ShaderExerciseManager {
     const def = this.current.def;
     const uniforms = this.current.uniforms;
 
-    for (const [name, u] of Object.entries(def.uniforms)) {
+    for (const [name, u] of Object.entries(def.uniforms || {})) {
       if (!u.gui || !uniforms[name]) continue;
 
       switch (u.type) {

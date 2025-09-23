@@ -1,3 +1,28 @@
+// SHADER 05: SHAPES - Introduction aux SDF (Signed Distance Fields)
+// ==================================================================
+// CONCEPTS APPRIS:
+// - SDF: représentation mathématique de formes
+// - Distance signée: négative à l'intérieur, positive à l'extérieur
+// - Import de fonctions depuis des bibliothèques
+// - Rotation 2D avec matrices
+// - Correction du ratio d'aspect
+//
+// FORMES DE BASE:
+// - sdCircle: cercle parfait
+// - sdBox: rectangle/carré
+// - sdHexagon: hexagone régulier
+//
+// AVANTAGES DES SDF:
+// - Facilité de transformation (rotation, scale)
+// - Opérations booléennes simples (union, intersection)
+// - Antialiasing naturel avec smoothstep
+// - Distance exacte pour effets spéciaux
+//
+// EXERCICES:
+// - Combinez plusieurs formes avec min()
+// - Créez des formes concentriques
+// - Ajoutez un contour avec abs(sdf) < thickness
+
 precision highp float;
 
 #import("sdf")

@@ -1,3 +1,40 @@
+// SHADER 12: THRESHOLD REVEAL - Masques et révélation progressive
+// =================================================================
+// CONCEPTS APPRIS:
+// - Création de masques avec seuillage
+// - Révélation progressive de textures
+// - Différents patterns de révélation
+// - FBM pour effets organiques
+// - Transitions dures vs douces
+// - Inversion de masques
+//
+// MODES DE RÉVÉLATION:
+// 0. Dissolution par bruit: effet organique aléatoire
+// 1. Gradient radial: du centre vers l'extérieur
+// 2. Gradient horizontal: de gauche à droite
+// 3. Gradient vertical: de bas en haut
+// 4. Gradient diagonal: coin à coin
+// 5. Spirale: révélation en spirale
+// 6. Diamond: pattern en diamant
+// 7. Wave: révélation ondulée
+//
+// TECHNIQUES:
+// - FBM pour bruit organique multi-échelle
+// - smoothstep vs step pour contrôler la douceur
+// - Patterns géométriques pour révélation
+// - Animation du seuil pour effet temporel
+//
+// APPLICATIONS:
+// - Transitions entre scènes
+// - Effets de dissolution
+// - Révélation de texte/images
+// - Masques dynamiques
+//
+// EXERCICES:
+// - Créez un pattern de révélation en grille
+// - Combinez plusieurs modes simultanément
+// - Utilisez le masque pour mélanger 2 textures
+
 precision highp float;
 
 varying vec2 vUv;

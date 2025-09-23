@@ -1,3 +1,25 @@
+// SHADER 04: SINWAVE - Fonctions trigonométriques animées
+// ========================================================
+// CONCEPTS APPRIS:
+// - Utilisation de sin() pour créer des ondulations
+// - Paramètres d'onde: fréquence, amplitude, phase
+// - Animation temporelle avec u_time
+// - Création de lignes avec smoothstep()
+// - Distance à une courbe
+//
+// FORMULE CLÉ:
+// wave = sin(x * frequency + time * speed) * amplitude
+//
+// TECHNIQUES:
+// - Moduler la position Y avec sin()
+// - Utiliser abs() pour la distance à la courbe
+// - smoothstep() pour l'épaisseur de ligne
+//
+// EXERCICES:
+// - Ajoutez plusieurs ondes superposées
+// - Créez une onde carrée avec sign(sin())
+// - Modulez l'épaisseur selon la position
+
 precision highp float;
 
 varying vec2 vUv;

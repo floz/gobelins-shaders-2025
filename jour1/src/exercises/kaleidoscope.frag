@@ -1,3 +1,38 @@
+// SHADER 13: KALEIDOSCOPE - Transformations polaires complexes
+// ============================================================
+// CONCEPTS APPRIS:
+// - Coordonnées polaires (angle, radius)
+// - Symétrie et miroirs mathématiques
+// - Segmentation angulaire de l'espace
+// - Génération de patterns complexes
+// - Conversion HSV vers RGB pour couleurs
+// - Transformations combinées (rotation + scale)
+//
+// TECHNIQUE KALÉIDOSCOPE:
+// 1. Conversion cartesian -> polaire
+// 2. Division de l'espace en segments angulaires
+// 3. Modulo sur l'angle pour répétition
+// 4. Miroir sur segments alternés
+// 5. Retour en coordonnées cartésiennes
+//
+// MATHÉMATIQUES CLÉS:
+// - atan2(y, x): angle en radians
+// - length(vec2): distance/radius
+// - mod(): répétition cyclique
+// - TAU (2*PI): cercle complet
+//
+// PATTERN GÉNÉRATEUR:
+// - Cercles mobiles superposés
+// - Ondes sinusoïdales basées sur distance
+// - Animation temporelle
+// - Conversion HSV pour couleurs vibrantes
+//
+// EXERCICES:
+// - Variez le nombre de segments dynamiquement
+// - Ajoutez des patterns plus complexes
+// - Combinez avec du bruit pour plus d'organicité
+// - Créez un effet de transition entre modes
+
 precision highp float;
 
 #import("math")

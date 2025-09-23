@@ -1,11 +1,49 @@
+// SHADER 14: HELLO WORLD - Exemple complexe avancé
+// =================================================
+// CONCEPTS COMBINÉS:
+// - Simplex noise implémentation complète
+// - Déformations UV multiples et chaînées
+// - Utilisation de textures externes
+// - Animations complexes avec sin/cos
+// - Effets de distorsion radiale
+// - Contraste ajustable
+//
+// CE SHADER DÉMONTRE:
+// - Comment combiner plusieurs techniques
+// - Chaînage de transformations UV
+// - Utilisation du bruit pour effets organiques
+// - Animation fluide multi-couches
+// - Déformation basée sur la distance au centre
+//
+// ANALYSE DU CODE:
+// - Ligne 62: rotation UV avec cos/sin + time
+// - Ligne 63: déformation horizontale selon distance
+// - Ligne 64: déformation verticale avec puissance
+// - Ligne 65: ajout de bruit pour organicité
+// - Ligne 66: calcul de distance pour effet radial
+// - Ligne 67: répétition fractale
+//
+// NOTE: Ce shader est intentionnellement complexe
+// pour montrer l'accumulation de techniques.
+// En production, privilégiez la lisibilité!
+//
+// EXERCICES:
+// - Décomposez chaque transformation séparément
+// - Simplifiez pour comprendre chaque effet
+// - Reconstruisez étape par étape
+
 precision highp float;
+
+#import("kaleidoscope")
 
 varying vec2 vUv;
 uniform float u_time;
 uniform float u_contrast;
 uniform sampler2D u_texture;
+uniform vec2 u_resolution;
 
 #define PI 3.14159265359
+
 
 
 // Simplex noise helpers
@@ -57,22 +95,44 @@ float simplexNoise(vec2 v) {
 void main() {
   vec2 uv = vUv;
 
+  // uv.y += cos( uv.x * 10. ) * .2;
+  // float distFromCenter = 1. - length(uv.y - .5 );
+  // // float line = step( .998, distFromCenter );
+  // float line = step( .998, distFromCenter );
+  // gl_FragColor = vec4( vec3( line ), 1. );
 
-	// uv = cos( uv * 2.0 * PI + u_time ) * 0.5 + 0.5;
-	uv.x += .2 * cos( u_time ) * length( uv - 0.5 );
-	float noise = simplexNoise( uv * 3.0 + u_time * 0.1 );
-	uv.y += pow( .4 * sin( uv.x + u_time * .41 )* length( uv - 0.5 ), 3. );
-	uv += max( 0., noise * .8 );
-	float d = length( abs(uv)-.3 );
-	uv += fract( d * 10. );
-	// uv.y += pow( sin( uv.y ), 4. );
-	vec4 tex = texture2D( u_texture, uv );
+  // float aspectRatio = u_resolution.x / u_resolution.y;
+  // uv.x = (uv.x - 0.5) * aspectRatio + 0.5;
 
-	// Apply contrast adjustment
-	float noiseTest = noise;
-  noiseTest = (noiseTest - 0.5) * u_contrast + 0.5;
-  noiseTest = clamp(noiseTest, 0.0, 1.0);
+  // Calculate grid lines
+    vec2 grid = abs(fract(uv * 2. - 0.5 ) - 0.5 );
+    vec2 gridLines = smoothstep(.0, .001, grid);
+    gl_FragColor = vec4(vec3(min(gridLines.x, gridLines.y)), 1.);
 
-  gl_FragColor = vec4( uv, 0., 1. );
+  // float circle = length(uv - .5 ) * .5;
+  // // circle = step(0.5, circle);
+  // circle = 1. - smoothstep(0.099, 0.1, circle);
+  // gl_FragColor = vec4(vec3(circle), 1.);
+
+	// vec2 uvKaleid = kaleidoscopeRotate( uv, 6., .5 );
+	// vec4 tex = texture2D( u_texture, uvKaleid );
+	// gl_FragColor = tex;
+
+	// // uv = cos( uv * 2.0 * PI + u_time ) * 0.5 + 0.5;
+	// uv.x += .2 * cos( u_time ) * length( uv - 0.5 );
+	// float noise = simplexNoise( uv * 3.0 + u_time * 0.1 );
+	// uv.y += pow( .4 * sin( uv.x + u_time * .41 )* length( uv - 0.5 ), 3. );
+	// uv += max( 0., noise * .8 );
+	// float d = length( abs(uv)-.3 );
+	// uv += fract( d * 10. );
+	// // uv.y += pow( sin( uv.y ), 4. );
+	// vec4 tex = texture2D( u_texture, uv );
+
+	// // Apply contrast adjustment
+	// float noiseTest = noise;
+  // noiseTest = (noiseTest - 0.5) * u_contrast + 0.5;
+  // noiseTest = clamp(noiseTest, 0.0, 1.0);
+
+  // gl_FragColor = vec4( uv, 0., 1. );
   // gl_FragColor = vec4( vec3( noiseTest ), 1. );
 }
