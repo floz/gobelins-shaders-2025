@@ -1,4 +1,6 @@
 import './style.css';
+import { initHelloWorldDemo, disposeHelloWorldDemo } from './demos/hello-world.js';
+import { initHelloWorldExercise, disposeHelloWorldExercise } from './exercises/hello-world/index.js';
 import { initSphereDemo, disposeSphereDemo } from './demos/sphere.js';
 import { initSuzanneDemo, disposeSuzanneDemo } from './demos/suzanne.js';
 import { initExercise, disposeExercise } from './demos/exercise.js';
@@ -8,6 +10,14 @@ import { initExerciseSimplified, disposeExerciseSimplified } from './demos/exerc
 let currentDispose = null;
 
 const demos = {
+    'hello-world': {
+        init: initHelloWorldDemo,
+        dispose: disposeHelloWorldDemo
+    },
+    'hello-world-exercise': {
+        init: initHelloWorldExercise,
+        dispose: disposeHelloWorldExercise
+    },
     sphere: {
         init: initSphereDemo,
         dispose: disposeSphereDemo
@@ -19,10 +29,6 @@ const demos = {
     exercise: {
         init: initExercise,
         dispose: disposeExercise
-    },
-    correction: {
-        init: initExerciseCorrection,
-        dispose: disposeExerciseCorrection
     },
     simplified: {
         init: initExerciseSimplified,
@@ -58,11 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const hash = window.location.hash.slice(1) || 'sphere';
+    const hash = window.location.hash.slice(1) || 'hello-world';
     switchDemo(hash);
 });
 
 window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.slice(1) || 'sphere';
+    const hash = window.location.hash.slice(1) || 'hello-world';
     switchDemo(hash);
 });

@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import vertexShader from './vCustom.glsl';
+import fragmentShader from './fCustom.glsl';
 
 export function patchPhysicalMaterial(material, uniforms) {
     material.userData.uniforms = uniforms;
@@ -120,80 +122,6 @@ export function patchPhysicalMaterial(material, uniforms) {
 }
 
 export function buildShaderMaterial(uniforms) {
-    const vertexShader = `
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        varying vec3 vWorldPosition;
-
-        uniform float uTwist;
-        uniform float uDispAmp;
-        uniform float uTime;
-
-        float hash(vec3 p) {
-            return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
-        }
-
-        mat2 rotate2D(float angle) {
-            float s = sin(angle);
-            float c = cos(angle);
-            return mat2(c, -s, s, c);
-        }
-
-        void main() {
-            vUv = uv;
-            vNormal = normalize(normalMatrix * normal);
-
-            vec3 pos = position;
-
-            float twistAngle = uTwist * pos.y * 3.14159;
-            pos.xz = rotate2D(twistAngle) * pos.xz;
-
-            float noiseValue = hash(pos * 3.0 + vec3(uTime * 0.2));
-            pos += normal * (noiseValue - 0.5) * 2.0 * uDispAmp;
-
-            vec4 worldPosition = modelMatrix * vec4(pos, 1.0);
-            vWorldPosition = worldPosition.xyz;
-
-            gl_Position = projectionMatrix * viewMatrix * worldPosition;
-        }
-    `;
-
-    const fragmentShader = `
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        varying vec3 vWorldPosition;
-
-        uniform float uThreshold;
-        uniform bool uUseTextures;
-        uniform vec3 uColorA;
-        uniform vec3 uColorB;
-        uniform sampler2D uMapA;
-        uniform sampler2D uMapB;
-
-        float edge(float x, float t) {
-            return smoothstep(t - 0.02, t + 0.02, x);
-        }
-
-        void main() {
-            vec3 A = uUseTextures ? texture2D(uMapA, vUv).rgb : uColorA;
-            vec3 B = uUseTextures ? texture2D(uMapB, vUv).rgb : uColorB;
-
-            float mask = edge(vUv.y, uThreshold);
-            vec3 finalColor = mix(A, B, mask);
-
-            vec3 normal = normalize(vNormal);
-            vec3 lightDir = normalize(vec3(5.0, 5.0, 5.0));
-            float diff = max(dot(normal, lightDir), 0.0);
-
-            vec3 ambient = finalColor * 0.3;
-            vec3 diffuse = finalColor * diff * 0.7;
-
-            vec3 result = ambient + diffuse;
-
-            gl_FragColor = vec4(result, 1.0);
-        }
-    `;
-
     return new THREE.ShaderMaterial({
         uniforms: uniforms,
         vertexShader,

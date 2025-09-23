@@ -14,7 +14,8 @@
   "license": "ISC",
   "packageManager": "pnpm@10.15.1",
   "devDependencies": {
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vite-plugin-glsl": "^1.5.1"
   },
   "dependencies": {
     "lil-gui": "^0.20.0",

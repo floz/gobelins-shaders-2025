@@ -3,6 +3,9 @@ import GUI from 'lil-gui';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { createScene } from '../utils/scene.js';
 import { patchPhysicalMaterial, buildShaderMaterial } from '../shaders/inject.js';
+// Optional: direct shader imports if needed
+// import vertexShader from '../shaders/vCustom.glsl';
+// import fragmentShader from '../shaders/fCustom.glsl';
 
 let gui;
 
@@ -139,8 +142,6 @@ export function initSuzanneDemo() {
             updateMaskType();
         });
         materialFolder.open();
-
-        gui.add(params, 'reset');
     }
 
     function updateMaskType() {

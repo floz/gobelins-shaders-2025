@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { createScene } from '../utils/scene.js';
 import { patchPhysicalMaterial, buildShaderMaterial } from '../shaders/inject.js';
+// Optional: direct shader imports if needed
+// import vertexShader from '../shaders/vCustom.glsl';
+// import fragmentShader from '../shaders/fCustom.glsl';
 
 let gui;
 
@@ -68,7 +71,7 @@ export function initSphereDemo() {
     shaderFolder.add(params, 'threshold', 0, 1).onChange(value => {
         uniforms.uThreshold.value = value;
     });
-    shaderFolder.add(params, 'twist', -1, 1).onChange(value => {
+    shaderFolder.add(params, 'twist', -5, 5).onChange(value => {
         uniforms.uTwist.value = value;
     });
     shaderFolder.add(params, 'dispAmp', 0, 0.3).onChange(value => {
@@ -97,8 +100,6 @@ export function initSphereDemo() {
         }
     });
     materialFolder.open();
-
-    gui.add(params, 'reset');
 
     start((elapsedTime) => {
         uniforms.uTime.value = elapsedTime;
