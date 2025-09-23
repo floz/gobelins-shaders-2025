@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Placeholder Assets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #222;
+            color: white;
+        }
+        canvas {
+            border: 1px solid #444;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .info {
+            margin: 20px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Placeholder Assets</h1>
+    <div class="info">
+        <p>Click the buttons below to download placeholder assets for the demos.</p>
+        <p>Save them to: <code>public/assets/textures/</code></p>
+    </div>
+
+    <h2>Texture A - Grid Pattern</h2>
+    <canvas id="canvasA" width="512" height="512"></canvas>
+    <br>
+    <button onclick="downloadTexture('canvasA', 'a.jpg')">Download as a.jpg</button>
+
+    <h2>Texture B - Circular Pattern</h2>
+    <canvas id="canvasB" width="512" height="512"></canvas>
+    <br>
+    <button onclick="downloadTexture('canvasB', 'b.jpg')">Download as b.jpg</button>
+
+    <script>
+        // Generate Texture A - Grid pattern
+        function generateTextureA() {
+            const canvas = document.getElementById('canvasA');
+            const ctx = canvas.getContext('2d');
+
+            // Gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+            gradient.addColorStop(0, '#ff6600');
+            gradient.addColorStop(0.5, '#ffcc00');
+            gradient.addColorStop(1, '#ff0066');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Grid pattern
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 2;
+            for(let i = 0; i < 512; i += 32) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, 512);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(512, i);
+                ctx.stroke();
+            }
+
+            // Add some detail
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            for(let x = 0; x < 512; x += 64) {
+                for(let y = 0; y < 512; y += 64) {
+                    if ((x / 64 + y / 64) % 2 === 0) {
+                        ctx.fillRect(x, y, 32, 32);
+                    }
+                }
+            }
+        }
+
+        // Generate Texture B - Circular pattern
+        function generateTextureB() {
+            const canvas = document.getElementById('canvasB');
+            const ctx = canvas.getContext('2d');
+
+            // Radial gradient
+            const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+            gradient.addColorStop(0, '#0066ff');
+            gradient.addColorStop(0.5, '#00ffff');
+            gradient.addColorStop(1, '#6600ff');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Concentric circles
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = 2;
+            for(let r = 25; r < 256; r += 25) {
+                ctx.beginPath();
+                ctx.arc(256, 256, r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Add radial lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 1;
+            for(let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+                ctx.beginPath();
+                ctx.moveTo(256, 256);
+                ctx.lineTo(256 + Math.cos(angle) * 256, 256 + Math.sin(angle) * 256);
+                ctx.stroke();
+            }
+        }
+
+        // Download function
+        function downloadTexture(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', 0.9);
+        }
+
+        // Generate textures on load
+        generateTextureA();
+        generateTextureB();
+
+        // Info message
+        console.log('Textures generated! Click the download buttons to save them.');
+        console.log('Save them to: public/assets/textures/');
+    </script>
+</body>
+</html>

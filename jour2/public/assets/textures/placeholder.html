@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Placeholder Textures</title>
+</head>
+<body>
+    <canvas id="canvasA" width="1024" height="1024"></canvas>
+    <canvas id="canvasB" width="1024" height="1024"></canvas>
+    <p>Right-click and save each canvas as a.jpg and b.jpg</p>
+
+    <script>
+        // Texture A - Grid pattern
+        const ctxA = document.getElementById('canvasA').getContext('2d');
+        const gradient1 = ctxA.createLinearGradient(0, 0, 1024, 1024);
+        gradient1.addColorStop(0, '#ff6600');
+        gradient1.addColorStop(0.5, '#ffcc00');
+        gradient1.addColorStop(1, '#ff0066');
+        ctxA.fillStyle = gradient1;
+        ctxA.fillRect(0, 0, 1024, 1024);
+
+        // Add grid
+        ctxA.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctxA.lineWidth = 2;
+        for(let i = 0; i < 1024; i += 64) {
+            ctxA.beginPath();
+            ctxA.moveTo(i, 0);
+            ctxA.lineTo(i, 1024);
+            ctxA.stroke();
+            ctxA.beginPath();
+            ctxA.moveTo(0, i);
+            ctxA.lineTo(1024, i);
+            ctxA.stroke();
+        }
+
+        // Texture B - Circular pattern
+        const ctxB = document.getElementById('canvasB').getContext('2d');
+        const gradient2 = ctxB.createRadialGradient(512, 512, 0, 512, 512, 512);
+        gradient2.addColorStop(0, '#0066ff');
+        gradient2.addColorStop(0.5, '#00ffff');
+        gradient2.addColorStop(1, '#6600ff');
+        ctxB.fillStyle = gradient2;
+        ctxB.fillRect(0, 0, 1024, 1024);
+
+        // Add circles
+        ctxB.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctxB.lineWidth = 3;
+        for(let r = 50; r < 512; r += 50) {
+            ctxB.beginPath();
+            ctxB.arc(512, 512, r, 0, Math.PI * 2);
+            ctxB.stroke();
+        }
+    </script>
+</body>
+</html>
