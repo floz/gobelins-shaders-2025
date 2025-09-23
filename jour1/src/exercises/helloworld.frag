@@ -109,15 +109,17 @@ void main() {
     vec2 gridLines = smoothstep(.0, .001, grid);
     gl_FragColor = vec4(vec3(min(gridLines.x, gridLines.y)), 1.);
 
-  // float circle = length(uv - .5 ) * .5;
-  // // circle = step(0.5, circle);
-  // circle = 1. - smoothstep(0.099, 0.1, circle);
+  float circle = length(uv - .5 ) * .5;
+  // circle = step(0.5, circle);
+  circle = 1. - smoothstep(0.099, 0.1, circle);
+  gl_FragColor.rgb = mix( gl_FragColor.rgb, vec3(circle), circle );
   // gl_FragColor = vec4(vec3(circle), 1.);
 
 	// vec2 uvKaleid = kaleidoscopeRotate( uv, 6., .5 );
 	// vec4 tex = texture2D( u_texture, uvKaleid );
 	// gl_FragColor = tex;
 
+/////
 	// // uv = cos( uv * 2.0 * PI + u_time ) * 0.5 + 0.5;
 	// uv.x += .2 * cos( u_time ) * length( uv - 0.5 );
 	// float noise = simplexNoise( uv * 3.0 + u_time * 0.1 );
