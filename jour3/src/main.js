@@ -10,6 +10,8 @@ import suzanneVertexShader from './shaders/suzanne/vertex.glsl';
 import suzanneFragmentShader from './shaders/suzanne/fragment.glsl';
 import particlesVertexShader from './shaders/particles/vertex.glsl';
 import particlesFragmentShader from './shaders/particles/fragment.glsl';
+import skyVertexShader from './shaders/sky/vertex.glsl';
+import skyFragmentShader from './shaders/sky/fragment.glsl';
 
 // Initialize shader chunks
 initializeShaderChunks();
@@ -19,12 +21,14 @@ const params = {
     groundProgress: 0,
     suzanneProgress: 0,
     particlesProgress: 0,
+    skyProgress: 0,
     noiseScale: 2.5,
     noiseSpeed: 0.3,
     displacementScale: 2,
     particleCount: 500,
     particleSpeed: 0.5,
-    particleRadius: 1.5
+    particleRadius: 1.5,
+    skyBrightness: 0.7
 };
 
 const { scene, camera, start } = createScene({
@@ -38,6 +42,28 @@ camera.lookAt(0, 0, 0);
 const textureLoader = new THREE.TextureLoader();
 const maskTexture = textureLoader.load('/textures/mask.jpg');
 maskTexture.wrapS = maskTexture.wrapT = THREE.RepeatWrapping;
+
+// Sky avec gradient rouge
+const skyGeometry = new THREE.IcosahedronGeometry(1, 5);
+const skyMaterial = new THREE.ShaderMaterial({
+    vertexShader: skyVertexShader,
+    fragmentShader: skyFragmentShader,
+    uniforms: {
+        uColor1: { value: new THREE.Color(0xff0a0a) }, // Dark red
+        uColor2: { value: new THREE.Color(0xf4de24) }, // Bright red
+        uColor3: { value: new THREE.Color(0xf47724) }, // Orange-red
+        uBrightness: { value: 0.7 },
+        uProgress: { value: 0 },
+        uMask: { value: maskTexture }
+    },
+    side: THREE.BackSide,
+    transparent: true,
+    depthTest: false
+});
+
+const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+sky.scale.setScalar(10000);
+
 
 // Textures pour le ground
 const vegetalTexture = textureLoader.load('/textures/vegetal_floor.jpg');
@@ -69,14 +95,17 @@ const groundMaterial = new THREE.ShaderMaterial({
         uDisplacementScale: { value: params.displacementScale}
     },
     transparent: true,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    // depthWrite: true
 });
 
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+ground.renderOrder = 1
 
 // ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1;
 scene.add(ground);
+scene.add(sky);
 
 const loader = new GLTFLoader();
 let suzanne = null;
@@ -111,6 +140,7 @@ loader.load(
         suzanne = new THREE.Mesh(geometry, suzanneMaterial);
         suzanne.scale.setScalar(0.8);
         scene.add(suzanne);
+        suzanne.renderOrder = 2
     }
 );
 
@@ -166,10 +196,12 @@ animationFolder.add(params, 'progress', 0, 1, 0.01).name('Global Progress').onCh
     params.groundProgress = value;
     params.suzanneProgress = value;
     params.particlesProgress = value;
+    params.skyProgress = value;
 });
 animationFolder.add(params, 'groundProgress', 0, 1, 0.01).name('Ground Progress');
 animationFolder.add(params, 'suzanneProgress', 0, 1, 0.01).name('Suzanne Progress');
 animationFolder.add(params, 'particlesProgress', 0, 1, 0.01).name('Particles Progress');
+animationFolder.add(params, 'skyProgress', 0, 1, 0.01).name('Sky Progress');
 
 const noiseFolder = gui.addFolder('Noise');
 noiseFolder.add(params, 'noiseScale', 0.5, 5, 0.1).name('Noise Scale');
@@ -179,6 +211,9 @@ noiseFolder.add(params, 'displacementScale', 0, 5, 0.01).name('Displacement');
 const particlesFolder = gui.addFolder('Particles');
 particlesFolder.add(params, 'particleSpeed', 0, 2, 0.01).name('Speed');
 particlesFolder.add(params, 'particleRadius', 0.5, 3, 0.1).name('Radius');
+
+const skyFolder = gui.addFolder('Sky');
+skyFolder.add(params, 'skyBrightness', 0, 1.2, 0.01).name('Brightness');
 
 animationFolder.open();
 
@@ -200,4 +235,8 @@ start((elapsedTime) => {
     particlesMaterial.uniforms.uSpeed.value = params.particleSpeed;
     particlesMaterial.uniforms.uRadius.value = params.particleRadius;
     particlesMaterial.uniforms.uNoiseScale.value = params.noiseScale;
+
+    // Animer le ciel avec le progress
+    skyMaterial.uniforms.uProgress.value = params.skyProgress;
+    skyMaterial.uniforms.uBrightness.value = params.skyBrightness * (0.3 + params.skyProgress * 0.7);
 });

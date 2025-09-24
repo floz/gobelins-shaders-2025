@@ -29,7 +29,7 @@ export function createScene(options = {}) {
         50,
         window.innerWidth / window.innerHeight,
         0.1,
-        100
+        100000
     );
     camera.position.copy(cameraPosition);
 
