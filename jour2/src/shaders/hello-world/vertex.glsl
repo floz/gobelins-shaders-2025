@@ -110,7 +110,7 @@ void main() {
     vPosition = mvPosition.xyz;
 
     // Position NON déformée en espace vue pour le fresnel stable
-    vViewPosition = (modelViewMatrix * vec4(objectPosition, 1.0)).xyz;
+    // vViewPosition = (modelViewMatrix * vec4(objectPosition, 1.0)).xyz;
 
     gl_Position = projectionMatrix * mvPosition;
 }

@@ -4,13 +4,13 @@ uniform vec3 uColorB;
 varying vec3 vNormal;
 varying vec3 vViewNormal;
 varying vec3 vPosition;
-varying vec3 vViewPosition; // Position non déformée pour le fresnel
+varying vec3 vViewPosition; 
 varying float vNoise;
 
 void main() {
     // Simple lighting calculation (en espace vue)
     vec3 lightDirection = normalize(vec3(1.0, 1.0, 1.0));
-    float lightIntensity = dot(normalize(vViewNormal), lightDirection) * 0.5 + 0.5;
+    float lightIntensity = dot(normalize(vNormal), lightDirection) * 0.5 + 0.5;
 
     // Mix colors based on noise
     vec3 color = mix(uColorA, uColorB, vNoise * 0.5 + 0.5);

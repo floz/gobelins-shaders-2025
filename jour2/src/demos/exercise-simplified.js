@@ -81,6 +81,20 @@ export function initExerciseSimplified() {
                 void main() {`
             );
 
+            // STEP 3B: Fix normals AFTER they are calculated
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <defaultnormal_vertex>',
+                `
+                #include <defaultnormal_vertex>
+
+                // Apply same twist to the normals!
+                float twistAngle = uTwist * position.y * 3.14159;
+                mat2 rot = rotate2D(twistAngle);
+                transformedNormal.xz = rot * transformedNormal.xz;
+                // transformedNormal *= 0.;
+                `
+            );
+
             // STEP 3: VERTEX SHADER - Use begin_vertex include replacement
             // This is more reliable than replacing the exact string
             shader.vertexShader = shader.vertexShader.replace(
@@ -94,8 +108,8 @@ export function initExerciseSimplified() {
 
                 // === APPLY DEFORMATIONS ===
                 // Twist around Y axis
-                float twistAngle = uTwist * position.y * 3.14159;
-                mat2 rot = rotate2D(twistAngle);
+                // float twistAngle = uTwist * position.y * 3.14159;
+                // mat2 rot = rotate2D(twistAngle);
                 transformed.xz = rot * transformed.xz;
 
                 // Displacement with noise
@@ -173,12 +187,12 @@ export function initExerciseSimplified() {
 
     const params = {
         threshold: 0.5,
-        twist: 0.0,
+        twist: .5,
         dispAmp: 0.0,
         useTextures: false,
         colorA: '#00ffff',
         colorB: '#ff00ff',
-        autoRotate: true,
+        autoRotate: false,
         reset: () => {
             params.threshold = 0.5;
             params.twist = 0.0;
