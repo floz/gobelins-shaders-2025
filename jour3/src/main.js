@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { createScene } from './utils/scene.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { initializeShaderChunks } from './utils/shaderChunks.js';
 
 import groundVertexShader from './shaders/ground/vertex.glsl';
 import groundFragmentShader from './shaders/ground/fragment.glsl';
@@ -10,6 +11,9 @@ import suzanneFragmentShader from './shaders/suzanne/fragment.glsl';
 import particlesVertexShader from './shaders/particles/vertex.glsl';
 import particlesFragmentShader from './shaders/particles/fragment.glsl';
 
+// Initialize shader chunks
+initializeShaderChunks();
+
 const params = {
     progress: 0,
     groundProgress: 0,
@@ -17,6 +21,7 @@ const params = {
     particlesProgress: 0,
     noiseScale: 2.5,
     noiseSpeed: 0.3,
+    displacementScale: 2,
     particleCount: 500,
     particleSpeed: 0.5,
     particleRadius: 1.5
@@ -34,7 +39,20 @@ const textureLoader = new THREE.TextureLoader();
 const maskTexture = textureLoader.load('/textures/mask.jpg');
 maskTexture.wrapS = maskTexture.wrapT = THREE.RepeatWrapping;
 
-const groundGeometry = new THREE.PlaneGeometry(15, 15, 128, 128);
+// Textures pour le ground
+const vegetalTexture = textureLoader.load('/textures/vegetal_floor.jpg');
+vegetalTexture.wrapS = vegetalTexture.wrapT = THREE.RepeatWrapping;
+vegetalTexture.repeat.set(8, 8);
+
+const levelTexture = textureLoader.load('/textures/level.jpg');
+levelTexture.wrapS = levelTexture.wrapT = THREE.RepeatWrapping;
+
+const groundGeometry = new THREE.PlaneGeometry(15, 15, 15, 15);
+// Apply rotation to the ground geometry using applyMatrix
+const rotationMatrix = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
+groundGeometry.applyMatrix4(rotationMatrix);
+
+
 const groundMaterial = new THREE.ShaderMaterial({
     vertexShader: groundVertexShader,
     fragmentShader: groundFragmentShader,
@@ -42,18 +60,22 @@ const groundMaterial = new THREE.ShaderMaterial({
         uTime: { value: 0 },
         uProgress: { value: 0 },
         uMask: { value: maskTexture },
+        uVegetalTexture: { value: vegetalTexture },
+        uLevelTexture: { value: levelTexture },
         uNoiseScale: { value: params.noiseScale },
         uNoiseSpeed: { value: params.noiseSpeed },
-        uColor1: { value: new THREE.Color(0xffffff) },
-        uColor2: { value: new THREE.Color(0xff00ff) }
+        uColor1: { value: new THREE.Color(0xff4444) }, // Vert comme dans la ref
+        uColor2: { value: new THREE.Color(0xf4de24) },
+        uDisplacementScale: { value: params.displacementScale}
     },
     transparent: true,
     side: THREE.DoubleSide
 });
 
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -0.5;
+
+// ground.rotation.x = -Math.PI / 2;
+ground.position.y = -1;
 scene.add(ground);
 
 const loader = new GLTFLoader();
@@ -152,6 +174,7 @@ animationFolder.add(params, 'particlesProgress', 0, 1, 0.01).name('Particles Pro
 const noiseFolder = gui.addFolder('Noise');
 noiseFolder.add(params, 'noiseScale', 0.5, 5, 0.1).name('Noise Scale');
 noiseFolder.add(params, 'noiseSpeed', 0, 1, 0.01).name('Noise Speed');
+noiseFolder.add(params, 'displacementScale', 0, 5, 0.01).name('Displacement');
 
 const particlesFolder = gui.addFolder('Particles');
 particlesFolder.add(params, 'particleSpeed', 0, 2, 0.01).name('Speed');
@@ -164,6 +187,7 @@ start((elapsedTime) => {
     groundMaterial.uniforms.uProgress.value = params.groundProgress;
     groundMaterial.uniforms.uNoiseScale.value = params.noiseScale;
     groundMaterial.uniforms.uNoiseSpeed.value = params.noiseSpeed;
+    groundMaterial.uniforms.uDisplacementScale.value = params.displacementScale;
 
     if (suzanneMaterial) {
         suzanneMaterial.uniforms.uTime.value = elapsedTime;
